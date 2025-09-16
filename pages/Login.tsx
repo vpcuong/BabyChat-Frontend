@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Mail, Lock, BookUser, Inbox } from 'lucide-react';
+import { type AxiosError } from 'axios'
+import apiClient from '../src/api/apiClient';
 
 interface LoginFormData {
   email: string;
@@ -31,9 +33,13 @@ const LoginPage: React.FC = () => {
     try {
       // Add your authentication logic here
       console.log('Logging in with:', formData);
-      // On success, redirect to messages page
-      navigate('/messages');
-    } catch (err) {
+      const data = await apiClient.get('/users')
+
+      console.log(data)
+     
+      // navigate('/messages');
+    } catch (err: AxiosError) {
+      console.log(err.message);
       setError('Invalid credentials. Please try again.');
     } finally {
       setIsLoading(false);
@@ -84,11 +90,11 @@ const LoginPage: React.FC = () => {
                   id="email"
                   name="email"
                   type="email"
-                  autoComplete="email"
+                  autoComplete="off"
                   required
                   value={formData.email}
                   onChange={handleChange}
-                  className="appearance-none rounded-lg relative block w-full pl-12 pr-3 py-3 border border-gray-300 dark:border-gray-600 placeholder-gray-500 dark:placeholder-gray-400 text-gray-900 focus:outline-none focus:ring-primary-500 focus:border-primary-500"
+                  className="appearance-none rounded-lg relative block w-full pl-12 pr-3 py-3 border border-gray-300 dark:border-gray-600 placeholder-gray-500 dark:placeholder-gray-400 text-gray-900 dark:text-white focus:outline-none focus:ring-primary-500 focus:border-primary-500"
                   placeholder="Email address"
                 />
               </div>
@@ -103,11 +109,11 @@ const LoginPage: React.FC = () => {
                   id="password"
                   name="password"
                   type="password"
-                  autoComplete="current-password"
+                  autoComplete="off"
                   required
                   value={formData.password}
                   onChange={handleChange}
-                  className="appearance-none rounded-lg relative block w-full pl-12 pr-3 py-3 border border-gray-300 dark:border-gray-600 placeholder-gray-500 dark:placeholder-gray-400 text-gray-900 dark:bg-gray-800 focus:outline-none focus:ring-primary-500 focus:border-primary-500"
+                  className="appearance-none rounded-lg relative block w-full pl-12 pr-3 py-3 border border-gray-300 dark:border-gray-600 placeholder-gray-500 dark:placeholder-gray-400 text-gray-900 dark:text-white  focus:outline-none focus:ring-primary-500 focus:border-primary-500"
                   placeholder="Password"
                 />
               </div>

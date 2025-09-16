@@ -1,9 +1,10 @@
 // api/client.ts
 import axios, { type AxiosInstance, type AxiosResponse, type AxiosError } from 'axios';
-
+import environmentLoader from '../config/environmentLoader';
+const env = environmentLoader.loadConfig();
 // Create base axios instance
 const apiClient: AxiosInstance = axios.create({
-  baseURL: process.env.REACT_APP_API_BASE_URL || 'https://api.example.com',
+  baseURL: env.apiUrl,
   timeout: 10000,
   headers: {
     'Content-Type': 'application/json',
@@ -13,7 +14,7 @@ const apiClient: AxiosInstance = axios.create({
 // Request interceptor for auth tokens
 apiClient.interceptors.request.use(
   (config) => {
-    const token = localStorage.getItem('authToken');
+    const token = localStorage.getItem('access_token');
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
@@ -30,7 +31,7 @@ apiClient.interceptors.response.use(
   (error: AxiosError) => {
     if (error.response?.status === 401) {
       // Handle unauthorized access
-      localStorage.removeItem('authToken');
+      localStorage.removeItem('access_token');
       window.location.href = '/login';
     }
     return Promise.reject(error);

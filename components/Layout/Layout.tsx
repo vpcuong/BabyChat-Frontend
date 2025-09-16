@@ -20,9 +20,13 @@ const Layout: React.FC<LayoutProps> = ({
 
   return (
     <div className={`min-h-screen flex flex-col bg-background ${className}`}>
-      {showHeader && <Header />}
+      {showHeader && (
+        <div className="fixed top-0 left-0 right-0 z-50">
+          <Header />
+        </div>
+      )}
       
-      <div className="flex flex-1">
+      <div className="flex flex-1 pt-16"> {/* Add padding-top to account for fixed header */}
         {showSidebar && (
           <Sidebar 
             isOpen={sidebarOpen} 

@@ -6,12 +6,12 @@ class EnvironmentLoader {
       return this.loadedConfig;
     }
 
-    const env = process.env.NODE_ENV;
+    const env = import.meta.env.VITE_NODE_ENV;
     
     // Different configs for different environments
     const configs = {
       development: {
-        apiUrl: process.env.REACT_APP_DEV_API_URL || 'http://localhost:3001',
+        apiUrl: import.meta.env.VITE_DEV_API_URL,
         features: {
           debugPanel: true,
           mockData: true,
@@ -19,7 +19,7 @@ class EnvironmentLoader {
         }
       },
       staging: {
-        apiUrl: process.env.REACT_APP_STAGING_API_URL,
+        apiUrl: import.meta.env.VITE_STAGING_API_URL,
         features: {
           debugPanel: true,
           mockData: false,
@@ -27,7 +27,7 @@ class EnvironmentLoader {
         }
       },
       production: {
-        apiUrl: process.env.REACT_APP_PROD_API_URL,
+        apiUrl: import.meta.env.VITE_PROD_API_URL,
         features: {
           debugPanel: false,
           mockData: false,

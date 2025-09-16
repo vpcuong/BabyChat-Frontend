@@ -41,8 +41,8 @@ const Header: React.FC<HeaderProps> = ({ className = '' }) => {
 
   // Mock user data (replace with your actual user data)
   const currentUser = {
-    name: 'John Doe',
-    email: 'john@example.com',
+    name: localStorage.getItem('username') || 'John Doe',
+    email: localStorage.getItem('email') || 'l9oDw@example.com',
     avatar: 'https://i.pravatar.cc/150?u=john',
   };
 
