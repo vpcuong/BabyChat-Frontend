@@ -43,7 +43,7 @@ const Header: React.FC<HeaderProps> = ({ className = '' }) => {
   const currentUser = {
     name: localStorage.getItem('username') || 'John Doe',
     email: localStorage.getItem('email') || 'l9oDw@example.com',
-    avatar: 'https://i.pravatar.cc/150?u=john',
+    avatar: 'https://i.pravatar.cc/150',
   };
 
   const navigationItems: NavigationItem[] = [
@@ -59,16 +59,18 @@ const Header: React.FC<HeaderProps> = ({ className = '' }) => {
   };
 
   const logOut = () => {
+    // Clear user data and navigate to the login page
+    localStorage.clear();
     navigate('/login');
   }
 
   return (
-    <header className={`bg-surface text-primary-500 dark:text-primary-300 shadow-md border-b border-gray-200 dark:border-gray-700 ${className}`}>
+    <header className={`bg-surface text-primary-500 shadow-md border-b border-gray-200 dark:border-gray-700 ${className}`}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           {/* Logo */}
           <div className="flex-shrink-0">
-            <h1 className="text-2xl font-bold text-primary-500 dark:text-primary-300">
+            <h1 className="text-2xl font-bold text-primary-500">
               Baby chat
             </h1>
           </div>
@@ -139,7 +141,7 @@ const Header: React.FC<HeaderProps> = ({ className = '' }) => {
                   <button
                     // return login page
                     onClick={ logOut }
-                    className="flex items-center w-full px-4 py-2 text-sm text-red-500 hover:bg-gray-100 dark:hover:bg-gray-700"
+                    className="flex items-center w-full px-4 py-2 text-sm text-red-500 hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer"
                   >
                     <LogOut size={16} className="mr-2" />
                     Sign out

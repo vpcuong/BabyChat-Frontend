@@ -32,15 +32,16 @@ const LoginPage: React.FC = () => {
 
     try {
       // Add your authentication logic here
-      console.log('Logging in with:', formData);
-      const data = await apiClient.get('/users')
+      const data = await apiClient.post('/auth/login', formData);
 
-      console.log(data)
+      localStorage.setItem('username', data.data.user.username);
+      localStorage.setItem('email', data.data.user.email);
+      localStorage.setItem('access_token', data.data.access_token);
+      localStorage.setItem('refresh_token', data.data.refresh_token);
      
-      // navigate('/messages');
-    } catch (err: AxiosError) {
-      console.log(err.message);
-      setError('Invalid credentials. Please try again.');
+      navigate('/');
+    } catch (err) {
+      setError(`Invalid credentials. Please try again!\n${err.response.data.message}`);
     } finally {
       setIsLoading(false);
     }
@@ -109,7 +110,7 @@ const LoginPage: React.FC = () => {
                   id="password"
                   name="password"
                   type="password"
-                  autoComplete="off"
+                  autoComplete="current-password"
                   required
                   value={formData.password}
                   onChange={handleChange}

@@ -100,7 +100,7 @@ const SignUpPage: React.FC = () => {
       localStorage.setItem('refresh_token', data.data.refresh_token);
       navigate('/');
     } catch (error: AxiosError | Error | any) {
-      toast.error(`Sign up failed. Please try again! ${error.response.data.message}`);
+      toast.error(`Sign up failed. Please try again!\n${error.response.data.message}`);
     } finally {
       setIsLoading(false);
     }
@@ -176,6 +176,7 @@ const SignUpPage: React.FC = () => {
                   name="password"
                   type={showPassword ? 'text' : 'password'}
                   required
+                  autoComplete='new-password'
                   value={formData.password}
                   onChange={handleChange}
                   className={`appearance-none rounded-lg relative block w-full pl-12 pr-12 py-3 border ${
@@ -205,6 +206,7 @@ const SignUpPage: React.FC = () => {
                   id="confirmPassword"
                   name="confirmPassword"
                   type={showPassword ? 'text' : 'password'}
+                  autoComplete='new-password'
                   required
                   value={formData.confirmPassword}
                   onChange={handleChange}
