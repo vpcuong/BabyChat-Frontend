@@ -2,13 +2,13 @@ import React, { useState, useRef, useEffect } from 'react';
 import { Search, Send, Video, Phone, MoreVertical, Smile, Paperclip } from 'lucide-react';
 import apiClient from '../src/api/apiClient';
 // --- MOCK DATA ---
-const conversationsData: IConversation[] = [
-  { id: '1', name: 'Alice', avatar: 'https://i.pravatar.cc/150?u=alice', lastMessage: 'Sounds good!', timestamp: '10:42 AM', unread: 2 },
-  { id: '2', name: 'Bob', avatar: 'https://i.pravatar.cc/150?u=bob', lastMessage: 'See you then.', timestamp: '9:30 AM', unread: 0 },
-  { id: '3', name: 'Charlie', avatar: 'https://i.pravatar.cc/150?u=charlie', lastMessage: 'Can you send the file?', timestamp: 'Yesterday', unread: 0 },
-  { id: '4', name: 'Diana', avatar: 'https://i.pravatar.cc/150?u=diana', lastMessage: 'Happy Birthday!', timestamp: 'Yesterday', unread: 1 },
-  { id: '5', name: 'Ethan', avatar: 'https://i.pravatar.cc/150?u=ethan', lastMessage: 'Project update is ready.', timestamp: '2 days ago', unread: 0 },
-];
+// const conversationsData: IConversation[] = [
+//   { id: '1', name: 'Alice', avatar: 'https://i.pravatar.cc/150?u=alice', lastMessage: 'Sounds good!', timestamp: '10:42 AM', unread: 2 },
+//   { id: '2', name: 'Bob', avatar: 'https://i.pravatar.cc/150?u=bob', lastMessage: 'See you then.', timestamp: '9:30 AM', unread: 0 },
+//   { id: '3', name: 'Charlie', avatar: 'https://i.pravatar.cc/150?u=charlie', lastMessage: 'Can you send the file?', timestamp: 'Yesterday', unread: 0 },
+//   { id: '4', name: 'Diana', avatar: 'https://i.pravatar.cc/150?u=diana', lastMessage: 'Happy Birthday!', timestamp: 'Yesterday', unread: 1 },
+//   { id: '5', name: 'Ethan', avatar: 'https://i.pravatar.cc/150?u=ethan', lastMessage: 'Project update is ready.', timestamp: '2 days ago', unread: 0 },
+// ];
 
 // --- END MOCK DATA ---
 interface IConversation{
@@ -71,16 +71,23 @@ const MessagesPage: React.FC<Props> = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
-  const handleSendMessage = (e: Event) => {
+  const handleSendMessage = async (e: Event) => {
     e.preventDefault();
+
+    console.log(`${selectedConversation?.id}`)
+    console.log(`${newMessage}`)
    
     setMessages((prevMessages) => [...prevMessages, { id: prevMessages.length + 1, sender: 'user', text: newMessage, timestamp: new Date().toLocaleTimeString() }]);
+
+    // send message
+    const data = await apiClient.post('/conversations/messages', { conversationId: selectedConversation?.id, content: newMessage });
+    console.log(data)
+    //
     setNewMessage('');
   };
 
-  const setCurrentChat = (convo: IConversation): void => {
-    console.log(convo)
-    setSelectedConversation(convo)
+  const setCurrentChat = (conv: IConversation): void => {
+    setSelectedConversation(conv)
   }
 
   return (
