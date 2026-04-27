@@ -1,6 +1,7 @@
 // src/App.tsx
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { ConfigProvider, theme as antdTheme, Typography } from 'antd';
 import { Layout } from '../components/Layout';
 import MessagesPage from '../pages/Messages';
 import HomePage from '../pages/Home';
@@ -15,13 +16,35 @@ import { Toaster } from 'react-hot-toast';
 
 const Dashboard: React.FC = () => (
   <div>
-    <h1 className="text-3xl font-bold text-gray-900 mb-6">Dashboard</h1>
-    <p className="text-gray-600">Your dashboard content goes here.</p>
+    <Typography.Title level={2}>Dashboard</Typography.Title>
+    <Typography.Text type="secondary">Your dashboard content goes here.</Typography.Text>
   </div>
 );
 
 const App: React.FC = () => {
+  const [isDark, setIsDark] = useState(
+    () => document.documentElement.classList.contains('dark')
+  );
+
+  useEffect(() => {
+    const observer = new MutationObserver(() => {
+      setIsDark(document.documentElement.classList.contains('dark'));
+    });
+    observer.observe(document.documentElement, { attributeFilter: ['class'] });
+    return () => observer.disconnect();
+  }, []);
+
   return (
+    <ConfigProvider
+      theme={{
+        algorithm: isDark ? antdTheme.darkAlgorithm : antdTheme.defaultAlgorithm,
+        token: {
+          colorPrimary: '#e8385a',
+          borderRadius: 8,
+          fontFamily: 'inherit',
+        },
+      }}
+    >
     <div className="App">
       <Router>
         <Routes>
@@ -77,7 +100,7 @@ const App: React.FC = () => {
             element={
               <Layout showHeader={false} showFooter={false}>
                 <div>
-                  <h1 className="text-2xl font-bold">Minimal Layout</h1>
+                  <Typography.Title level={3}>Minimal Layout</Typography.Title>
                   <p>No header or footer on this page.</p>
                 </div>
               </Layout>
@@ -125,6 +148,7 @@ const App: React.FC = () => {
         }}
       />
     </div>
+    </ConfigProvider>
   );
 };
 

@@ -1,17 +1,12 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Search, Send, Video, Phone, MoreVertical, Smile, Paperclip } from 'lucide-react';
+import { Phone, Video, MoreVertical, Smile, Paperclip } from 'lucide-react';
+import { Input, Button, Badge, Avatar, Tooltip, Typography, Space } from 'antd';
+import { SearchOutlined, SendOutlined } from '@ant-design/icons';
 import apiClient from '../src/api/apiClient';
-// --- MOCK DATA ---
-// const conversationsData: IConversation[] = [
-//   { id: '1', name: 'Alice', avatar: 'https://i.pravatar.cc/150?u=alice', lastMessage: 'Sounds good!', timestamp: '10:42 AM', unread: 2 },
-//   { id: '2', name: 'Bob', avatar: 'https://i.pravatar.cc/150?u=bob', lastMessage: 'See you then.', timestamp: '9:30 AM', unread: 0 },
-//   { id: '3', name: 'Charlie', avatar: 'https://i.pravatar.cc/150?u=charlie', lastMessage: 'Can you send the file?', timestamp: 'Yesterday', unread: 0 },
-//   { id: '4', name: 'Diana', avatar: 'https://i.pravatar.cc/150?u=diana', lastMessage: 'Happy Birthday!', timestamp: 'Yesterday', unread: 1 },
-//   { id: '5', name: 'Ethan', avatar: 'https://i.pravatar.cc/150?u=ethan', lastMessage: 'Project update is ready.', timestamp: '2 days ago', unread: 0 },
-// ];
 
-// --- END MOCK DATA ---
-interface IConversation{
+const { Text, Title } = Typography;
+
+interface IConversation {
   id: string;
   name: string;
   avatar: string;
@@ -20,161 +15,221 @@ interface IConversation{
   unread: number;
 }
 
-interface IMessage{
+interface IMessage {
   id: number;
   sender: string;
   text: string;
   timestamp: string;
 }
 
-interface Props {
-  // Define your props here
-  userId?: number;
-}
+const TOKEN = '#e8385a';
 
-const MessagesPage: React.FC<Props> = () => {
-  const [conversations, setConversations]: [IConversation[] | [], React.Dispatch<React.SetStateAction<IConversation[] | []>>] = useState<IConversation[] | []>([]);
-  const [selectedConversation, setSelectedConversation]: [IConversation | null, React.Dispatch<React.SetStateAction<IConversation | null>>] = useState<IConversation | null>(conversations[0]);
-  const [messages, setMessages]: [IMessage[] | [], React.Dispatch<React.SetStateAction<IMessage[] | []>>]
-  = useState<IMessage[] | []>([]);
+const MessagesPage: React.FC = () => {
+  const [conversations, setConversations] = useState<IConversation[]>([]);
+  const [selectedConversation, setSelectedConversation] = useState<IConversation | null>(null);
+  const [messages, setMessages] = useState<IMessage[]>([]);
   const [newMessage, setNewMessage] = useState('');
-  const messagesEndRef = useRef<null | HTMLDivElement>(null);
+  const [isSending, setIsSending] = useState(false);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const fetchData = async () => {
-        const data = await apiClient.get('/conversations');
-        const convData: IConversation[] = data.data.map((conv: { _id: string; [key: string]: any }) => {
-          const { _id, ...rest } = conv;
-          return {
-            id: _id,
-            ...rest
-          };
-        });
-
-        setConversations(
-          convData.map(conv => ({
-            ...conv,
-            unread: 2,
-            avatar: `https://i.pravatar.cc/150`,
-            lastMessage: 'Sounds good!',
-            timestamp: '10:42 AM'
-          }))
-        )
-
-        setSelectedConversation(convData[0])
-    }
-    
-    fetchData().catch(console.error) // Handle any errors
+      const response = await apiClient.get('/conversations');
+      const convData: IConversation[] = response.data.map((conv: any) => ({
+        id: conv._id,
+        ...conv,
+        avatar: conv.avatar || `https://i.pravatar.cc/150?u=${conv._id}`,
+        lastMessage: conv.lastMessage || 'No messages yet',
+        timestamp: conv.timestamp || new Date().toLocaleTimeString(),
+        unread: conv.unread || 0,
+      }));
+      setConversations(convData);
+      if (convData.length > 0) setSelectedConversation(convData[0]);
+    };
+    fetchData().catch(console.error);
   }, []);
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
-  const handleSendMessage = async (e: Event) => {
+  useEffect(() => {
+    const fetchMessages = async () => {
+      if (!selectedConversation) return;
+      const response = await apiClient.get(`/conversations/${selectedConversation.id}/pages`);
+      const pages = response.data.pages.list;
+      if (pages.length === 0) { setMessages([]); return; }
+      const lastPage = pages[pages.length - 1];
+      const messagesData: IMessage[] = lastPage.messages.map((message: any) => ({
+        id: message._id,
+        sender: message.sender,
+        text: message.content,
+        timestamp: message.timestamp || new Date().toLocaleTimeString(),
+      }));
+      setMessages(messagesData);
+    };
+    fetchMessages().catch(console.error);
+  }, [selectedConversation]);
+
+  const handleSendMessage = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    if (!newMessage.trim() || isSending) return;
 
-    console.log(`${selectedConversation?.id}`)
-    console.log(`${newMessage}`)
-   
-    setMessages((prevMessages) => [...prevMessages, { id: prevMessages.length + 1, sender: 'user', text: newMessage, timestamp: new Date().toLocaleTimeString() }]);
-
-    // send message
-    const data = await apiClient.post('/conversations/messages', { conversationId: selectedConversation?.id, content: newMessage });
-    console.log(data)
-    //
+    const optimisticMsg: IMessage = {
+      id: Date.now(),
+      sender: 'me',
+      text: newMessage,
+      timestamp: new Date().toLocaleTimeString(),
+    };
+    setMessages((prev) => [...prev, optimisticMsg]);
     setNewMessage('');
+    setIsSending(true);
+
+    try {
+      await apiClient.post('/conversations/messages', {
+        conversationId: selectedConversation?.id,
+        content: optimisticMsg.text,
+      });
+    } catch {
+      setMessages((prev) => prev.filter((m) => m.id !== optimisticMsg.id));
+      console.error('Failed to send message');
+    } finally {
+      setIsSending(false);
+    }
   };
 
-  const setCurrentChat = (conv: IConversation): void => {
-    setSelectedConversation(conv)
-  }
-
   return (
-    <div className="flex h-[calc(100vh-8rem)]">
-      {/* Conversation List (Sidebar) */}
-      <div className="w-1/4 border-r border-gray-200 flex flex-col">
-        <div className="p-4 border-b border-gray-200">
-          <h2 className="text-xl dark:text-white font-bold">Chats</h2>
-          <div className="relative mt-4">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={20} />
-            <input
-              type="text"
-              placeholder="Search messages"
-              className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-primary-500 dark:text-white"
-            />
-          </div>
+    <div style={{ display: 'flex', height: 'calc(100vh - 8rem)', overflow: 'hidden' }}>
+      {/* Conversation List */}
+      <div style={{ width: '25%', borderRight: '1px solid #f0f0f0', display: 'flex', flexDirection: 'column' }}>
+        <div style={{ padding: 16, borderBottom: '1px solid #f0f0f0' }}>
+          <Title level={4} style={{ margin: '0 0 12px' }}>Chats</Title>
+          <Input
+            placeholder="Search messages"
+            prefix={<SearchOutlined style={{ color: '#9ca3af' }} />}
+            style={{ borderRadius: 999 }}
+            aria-label="Search messages"
+          />
         </div>
-        <div className="flex-grow overflow-y-auto">
-          {conversations.map((convo) => (
-            <div key={convo.id}
-              className={`flex items-center p-3 cursor-pointer hover:bg-gray-300 ${selectedConversation?.id === convo.id ? 'bg-gray-200' : 'bg-gray-100'}`}
-              onClick={() => setCurrentChat(convo)}
-            >
-              <img src={convo.avatar} alt={convo.name} className="w-12 h-12 rounded-full mr-4" />
-              <div className="flex-grow">
-                <div className="flex justify-between items-center">
-                  <h3 className="font-semibold">{convo.name}</h3>
-                  <span className="text-xs text-gray-500">{convo.timestamp}</span>
-                </div>
-                <div className="flex justify-between items-center">
-                  <p className="text-sm text-gray-600 truncate">{convo.lastMessage}</p>
-                  {convo.unread > 0 && (
-                    <span className="bg-blue-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">{convo.unread}</span>
-                  )}
+
+        <div style={{ flex: 1, overflowY: 'auto' }}>
+          {conversations.map((convo) => {
+            const isSelected = selectedConversation?.id === convo.id;
+            return (
+              <div
+                key={convo.id}
+                onClick={() => setSelectedConversation(convo)}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  padding: '12px 16px',
+                  cursor: 'pointer',
+                  background: isSelected ? '#fff0f3' : undefined,
+                  borderLeft: isSelected ? `3px solid ${TOKEN}` : '3px solid transparent',
+                  transition: 'background 0.15s',
+                }}
+                onMouseEnter={(e) => { if (!isSelected) e.currentTarget.style.background = '#fafafa'; }}
+                onMouseLeave={(e) => { if (!isSelected) e.currentTarget.style.background = ''; }}
+              >
+                <Avatar src={convo.avatar} alt={convo.name} size={48} style={{ flexShrink: 0, marginRight: 12 }} />
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <Text strong style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                      {convo.name}
+                    </Text>
+                    <Text type="secondary" style={{ fontSize: 11, flexShrink: 0, marginLeft: 8 }}>
+                      {convo.timestamp}
+                    </Text>
+                  </div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <Text type="secondary" style={{ fontSize: 13, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                      {convo.lastMessage}
+                    </Text>
+                    {convo.unread > 0 && <Badge count={convo.unread} size="small" style={{ marginLeft: 8, flexShrink: 0 }} />}
+                  </div>
                 </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       </div>
 
       {/* Chat Window */}
-      <div className="w-3/4 flex flex-col">
+      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', minWidth: 0 }}>
         {/* Chat Header */}
-        <div className="flex items-center justify-between p-3 border-b border-gray-200">
-          <div className="flex items-center">
-            <img src={selectedConversation?.avatar || ''} alt={selectedConversation?.name|| ''} className="w-10 h-10 rounded-full mr-3" />
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '8px 16px', borderBottom: '1px solid #f0f0f0' }}>
+          <Space>
+            <Avatar src={selectedConversation?.avatar} size={40} />
             <div>
-              <h3 className="font-semibold text-lg dark:text-white">{selectedConversation?.name || ''}</h3>
-              <p className="text-sm text-gray-500 dark:text-gray-400">Online</p>
+              <Text strong style={{ display: 'block' }}>{selectedConversation?.name || ''}</Text>
+              <Text type="secondary" style={{ fontSize: 12 }}>Online</Text>
             </div>
-          </div>
-          <div className="flex items-center space-x-4 text-gray-500">
-            <Phone size={22} className="cursor-pointer hover:text-primary-500" />
-            <Video size={22} className="cursor-pointer hover:text-primary-500" />
-            <MoreVertical size={22} className="cursor-pointer hover:text-primary-500" />
-          </div>
+          </Space>
+          <Space size={4}>
+            <Tooltip title="Voice call">
+              <Button type="text" icon={<Phone size={20} />} aria-label="Voice call" />
+            </Tooltip>
+            <Tooltip title="Video call">
+              <Button type="text" icon={<Video size={20} />} aria-label="Video call" />
+            </Tooltip>
+            <Tooltip title="More options">
+              <Button type="text" icon={<MoreVertical size={20} />} aria-label="More options" />
+            </Tooltip>
+          </Space>
         </div>
 
         {/* Messages Area */}
-        <div className="flex-grow p-6 overflow-y-auto bg-gray-50 dark:bg-surface">
-          {messages.map((msg: IMessage) => (
-            <div key={msg.id} className={`flex mb-4 ${msg.sender === 'me' ? 'justify-end' : 'justify-start'}`}>
-              <div className={`max-w-md ${msg.sender === 'me' ? 'bg-blue-500 text-white' : 'bg-white border' } rounded-lg p-3`}>
-                <p>{msg.text}</p>
-                <p className={`text-xs mt-1 ${msg.sender === 'me' ? 'text-blue-100' : 'text-gray-400'} text-right`}>{msg.timestamp}</p>
+        <div style={{ flex: 1, padding: 24, overflowY: 'auto', background: '#fafafa' }}>
+          {messages.map((msg) => {
+            const isMe = msg.sender === 'me';
+            return (
+              <div key={msg.id} style={{ display: 'flex', marginBottom: 16, justifyContent: isMe ? 'flex-end' : 'flex-start' }}>
+                <div style={{
+                  maxWidth: 420,
+                  padding: '10px 14px',
+                  borderRadius: 16,
+                  background: isMe ? TOKEN : '#fff',
+                  border: isMe ? 'none' : '1px solid #f0f0f0',
+                  boxShadow: '0 1px 2px rgba(0,0,0,0.06)',
+                }}>
+                  <Text style={{ display: 'block', color: isMe ? '#fff' : undefined }}>{msg.text}</Text>
+                  <Text style={{ display: 'block', fontSize: 11, marginTop: 4, textAlign: 'right', color: isMe ? 'rgba(255,255,255,0.7)' : '#9ca3af' }}>
+                    {msg.timestamp}
+                  </Text>
+                </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
           <div ref={messagesEndRef} />
         </div>
 
         {/* Message Input */}
-        <div className="p-4 bg-white border-t border-gray-200">
-          <form onSubmit={handleSendMessage} className="flex items-center space-x-3">
-            <Paperclip className="text-gray-500 cursor-pointer hover:text-primary-500" size={22} />
-            <Smile className="text-gray-500 cursor-pointer hover:text-primary-500" size={22} />
-            <input
-              type="text"
-              value={newMessage}
-              onChange={(e) => setNewMessage(e.target.value)}
-              placeholder="Type a message..."
-              className="flex-grow px-4 py-2 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-primary-500"
-            />
-            <button type="submit" className="bg-primary-500 text-white p-2 rounded-full hover:bg-primary-600 cursor-pointer">
-              <Send size={22} />
-            </button>
+        <div style={{ padding: '12px 16px', background: '#fff', borderTop: '1px solid #f0f0f0' }}>
+          <form onSubmit={handleSendMessage}>
+            <Space.Compact style={{ width: '100%', display: 'flex', alignItems: 'center', gap: 8 }}>
+              <Tooltip title="Attach file">
+                <Button type="text" icon={<Paperclip size={20} />} aria-label="Attach file" />
+              </Tooltip>
+              <Tooltip title="Emoji">
+                <Button type="text" icon={<Smile size={20} />} aria-label="Emoji" />
+              </Tooltip>
+              <Input
+                value={newMessage}
+                onChange={(e) => setNewMessage(e.target.value)}
+                placeholder="Type a message..."
+                style={{ borderRadius: 999, flex: 1 }}
+                aria-label="Message input"
+              />
+              <Button
+                type="primary"
+                htmlType="submit"
+                shape="circle"
+                icon={<SendOutlined />}
+                loading={isSending}
+                disabled={!newMessage.trim()}
+                aria-label="Send message"
+              />
+            </Space.Compact>
           </form>
         </div>
       </div>

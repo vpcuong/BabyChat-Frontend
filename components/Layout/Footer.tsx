@@ -1,66 +1,55 @@
-// src/components/Layout/Footer.tsx
 import React from 'react';
+import { Row, Col, Typography, Divider, Space, theme } from 'antd';
 import type { FooterProps } from '../../types/layout';
+
+const { Title, Text, Link } = Typography;
+const { useToken } = theme;
 
 const Footer: React.FC<FooterProps> = () => {
   const currentYear = new Date().getFullYear();
+  const { token } = useToken();
 
   return (
-    <footer className={`bg-surface text-primary-500`}>
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="py-8">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {/* Company Info */}
-            <div>
-              <h3 className="text-lg font-semibold mb-4">Baby chat</h3>
-              <p className="text-primary-500 text-sm">
-                Building amazing experiences with React, TypeScript, and Tailwind CSS.
-              </p>
-            </div>
+    <footer style={{ background: token.colorBgContainer, borderTop: `1px solid ${token.colorBorderSecondary}`, padding: '32px 0 0' }}>
+      <div style={{ maxWidth: 1280, margin: '0 auto', padding: '0 24px' }}>
+        <Row gutter={[32, 32]}>
+          <Col xs={24} md={8}>
+            <Title level={5} style={{ color: '#e8385a' }}>Baby Chat</Title>
+            <Text type="secondary" style={{ fontSize: 13 }}>
+              Building amazing experiences with React, TypeScript, and Ant Design.
+            </Text>
+          </Col>
 
-            {/* Quick Links */}
-            <div>
-              <h3 className="text-lg font-semibold mb-4">Quick Links</h3>
-              <ul className="space-y-2">
-                <li>
-                  <a href="/" className="text-primary-500 hover:text-primary-700 text-sm transition-colors duration-200">
-                    Home
-                  </a>
-                </li>
-                <li>
-                  <a href="/about" className="text-primary-500 hover:text-primary-700 text-sm transition-colors duration-200">
-                    About
-                  </a>
-                </li>
-                <li>
-                  <a href="/services" className="text-primary-500 hover:text-primary-700 text-sm transition-colors duration-200">
-                    Services
-                  </a>
-                </li>
-                <li>
-                  <a href="/contact" className="text-primary-500 hover:text-primary-700 text-sm transition-colors duration-200">
-                    Contact
-                  </a>
-                </li>
-              </ul>
-            </div>
+          <Col xs={24} md={8}>
+            <Title level={5}>Quick Links</Title>
+            <Space direction="vertical" size={4}>
+              {[
+                { label: 'Home', href: '/' },
+                { label: 'About', href: '/about' },
+                { label: 'Services', href: '/services' },
+                { label: 'Contact', href: '/contact' },
+              ].map((item) => (
+                <Link key={item.href} href={item.href} style={{ fontSize: 13 }}>
+                  {item.label}
+                </Link>
+              ))}
+            </Space>
+          </Col>
 
-            {/* Contact Info */}
-            <div>
-              <h3 className="text-lg font-semibold mb-4">Contact</h3>
-              <div className="text-primary-500 text-sm space-y-2">
-                <p>Email: contact@yourapp.com</p>
-                <p>Phone: +1 (555) 123-4567</p>
-              </div>
-            </div>
-          </div>
+          <Col xs={24} md={8}>
+            <Title level={5}>Contact</Title>
+            <Space direction="vertical" size={4}>
+              <Text type="secondary" style={{ fontSize: 13 }}>Email: contact@yourapp.com</Text>
+              <Text type="secondary" style={{ fontSize: 13 }}>Phone: +1 (555) 123-4567</Text>
+            </Space>
+          </Col>
+        </Row>
 
-          {/* Copyright */}
-          <div className="border-t border-primary-800 mt-8 pt-8">
-            <p className="text-center text-primary-500 text-sm">
-              © {currentYear} Your App. All rights reserved.
-            </p>
-          </div>
+        <Divider style={{ margin: '24px 0 16px' }} />
+        <div style={{ textAlign: 'center', paddingBottom: 16 }}>
+          <Text type="secondary" style={{ fontSize: 13 }}>
+            © {currentYear} Baby Chat. All rights reserved.
+          </Text>
         </div>
       </div>
     </footer>

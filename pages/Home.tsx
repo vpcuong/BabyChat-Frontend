@@ -1,25 +1,28 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import { Typography, Button, Row, Col, Card, Space } from 'antd';
 import { MessageSquareText, Users, ShieldCheck, Zap } from 'lucide-react';
+
+const { Title, Paragraph, Text } = Typography;
 
 const features = [
   {
-    icon: <Zap size={32} className="text-primary-500" />,
+    icon: <Zap size={32} color="#e8385a" />,
     title: 'Instant Messaging',
     description: 'Connect in real-time with our blazing-fast messaging infrastructure. No delays, just conversation.',
   },
   {
-    icon: <Users size={32} className="text-primary-500" />,
+    icon: <Users size={32} color="#e8385a" />,
     title: 'Group Chats',
     description: 'Create groups for your friends, family, or team. Stay connected with everyone in one place.',
   },
   {
-    icon: <ShieldCheck size={32} className="text-primary-500" />,
+    icon: <ShieldCheck size={32} color="#e8385a" />,
     title: 'Secure & Private',
     description: 'Your conversations are yours. With end-to-end encryption, your privacy is our top priority.',
   },
   {
-    icon: <MessageSquareText size={32} className="text-primary-500" />,
+    icon: <MessageSquareText size={32} color="#e8385a" />,
     title: 'Rich Communication',
     description: 'Express yourself fully with support for emojis, GIFs, and file sharing. Make every chat lively.',
   },
@@ -27,83 +30,64 @@ const features = [
 
 const HomePage: React.FC = () => {
   return (
-    <div className="text-gray-800 dark:text-gray-200">
+    <div>
       {/* Hero Section */}
-      <section className="py-20 md:py-32">
-        <div className="container mx-auto px-6 text-center">
-          <h1 className="text-4xl md:text-6xl font-bold text-gray-900 dark:text-white leading-tight">
-            Connect Instantly,
-            <br />
-            <span className="text-primary-500">Chat Seamlessly.</span>
-          </h1>
-          <p className="mt-6 text-lg md:text-xl text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
-            Welcome to Baby Chat, the simple, fast, and secure way to stay in touch with the people who matter most.
-          </p>
-          <div className="mt-8 flex justify-center gap-4">
-            <Link
-              to="/messages"
-              className="px-8 py-3 bg-primary-500 text-white font-semibold rounded-full shadow-lg hover:bg-primary-600 transition-transform transform hover:scale-105"
-            >
+      <section style={{ padding: '80px 0 60px', textAlign: 'center' }}>
+        <Title style={{ fontSize: 52, lineHeight: 1.15 }}>
+          Connect Instantly,{' '}
+          <Text style={{ color: '#e8385a', fontSize: 'inherit' }}>Chat Seamlessly.</Text>
+        </Title>
+        <Paragraph style={{ fontSize: 18, maxWidth: 600, margin: '16px auto 32px', color: '#6b7280' }}>
+          Welcome to Baby Chat, the simple, fast, and secure way to stay in touch with the people who matter most.
+        </Paragraph>
+        <Space size={16} wrap>
+          <Link to="/messages">
+            <Button type="primary" size="large" shape="round" style={{ minWidth: 140 }}>
               Start Chatting
-            </Link>
-            <Link
-              to="/about"
-              className="px-8 py-3 bg-surface text-primary-500 dark:bg-gray-700 dark:text-primary-300 font-semibold rounded-full shadow-md hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors"
-            >
+            </Button>
+          </Link>
+          <Link to="/about">
+            <Button size="large" shape="round" style={{ minWidth: 140 }}>
               Learn More
-            </Link>
-          </div>
-        </div>
+            </Button>
+          </Link>
+        </Space>
       </section>
 
       {/* Features Section */}
-      <section className="bg-surface py-20">
-        <div className="container mx-auto px-6">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white">
-              Everything You Need to Connect
-            </h2>
-            <p className="mt-4 text-gray-600 dark:text-gray-400">
-              A feature-rich experience designed for modern communication.
-            </p>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-            {features.map((feature) => (
-              <div
-                key={feature.title}
-                className="bg-surface p-6 rounded-lg shadow-sm text-center card-hover"
-              >
-                <div className="flex justify-center mb-4">{feature.icon}</div>
-                <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
-                  {feature.title}
-                </h3>
-                <p className="text-gray-600 dark:text-gray-400">
-                  {feature.description}
-                </p>
-              </div>
-            ))}
-          </div>
+      <section style={{ padding: '60px 0', background: 'rgba(0,0,0,0.02)', borderRadius: 16 }}>
+        <div style={{ textAlign: 'center', marginBottom: 40 }}>
+          <Title level={2}>Everything You Need to Connect</Title>
+          <Paragraph style={{ color: '#6b7280' }}>
+            A feature-rich experience designed for modern communication.
+          </Paragraph>
         </div>
+        <Row gutter={[24, 24]}>
+          {features.map((feature) => (
+            <Col key={feature.title} xs={24} sm={12} lg={6}>
+              <Card hoverable style={{ textAlign: 'center', height: '100%' }}>
+                <div style={{ marginBottom: 16 }}>{feature.icon}</div>
+                <Title level={5}>{feature.title}</Title>
+                <Paragraph type="secondary" style={{ marginBottom: 0 }}>
+                  {feature.description}
+                </Paragraph>
+              </Card>
+            </Col>
+          ))}
+        </Row>
       </section>
 
-      {/* Final CTA Section */}
-      <section className="py-20">
-        <div className="container mx-auto px-6 text-center">
-          <h2 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white">
-            Ready to Join the Conversation?
-          </h2>
-          <p className="mt-4 text-lg text-gray-600 dark:text-gray-400 max-w-xl mx-auto">
-            Create an account in seconds and start connecting with your world today. It's free!
-          </p>
-          <div className="mt-8">
-            <Link
-              to="/signup"
-              className="px-10 py-4 bg-primary-500 text-white font-bold text-lg rounded-full shadow-xl hover:bg-primary-600 transition-transform transform hover:scale-105"
-            >
-              Sign Up Now
-            </Link>
-          </div>
-        </div>
+      {/* CTA Section */}
+      <section style={{ padding: '80px 0', textAlign: 'center' }}>
+        <Title level={2}>Ready to Join the Conversation?</Title>
+        <Paragraph style={{ fontSize: 16, color: '#6b7280', maxWidth: 480, margin: '12px auto 32px' }}>
+          Create an account in seconds and start connecting with your world today. It's free!
+        </Paragraph>
+        <Link to="/signup">
+          <Button type="primary" size="large" shape="round" style={{ minWidth: 160 }}>
+            Sign Up Now
+          </Button>
+        </Link>
       </section>
     </div>
   );

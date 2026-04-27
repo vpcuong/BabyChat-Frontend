@@ -1,9 +1,13 @@
-// src/components/Layout/Layout.tsx
 import React, { useState } from 'react';
+import { Layout as AntLayout, Button, Grid } from 'antd';
+import { MenuOutlined } from '@ant-design/icons';
 import type { LayoutProps } from '../../types/layout';
 import Header from './Header';
 import Footer from './Footer';
 import Sidebar from './Sidebar';
+
+const { Content } = AntLayout;
+const { useBreakpoint } = Grid;
 
 const Layout: React.FC<LayoutProps> = ({
   children,
@@ -13,50 +17,41 @@ const Layout: React.FC<LayoutProps> = ({
   showSidebar = false,
 }) => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
-
-  const toggleSidebar = () => {
-    setSidebarOpen(!sidebarOpen);
-  };
+  const screens = useBreakpoint();
+  const isLg = !!screens.lg;
 
   return (
-    <div className={`min-h-screen flex flex-col bg-background ${className}`}>
+    <AntLayout style={{ minHeight: '100vh' }} className={className}>
       {showHeader && (
-        <div className="fixed top-0 left-0 right-0 z-50">
+        <div style={{ position: 'fixed', top: 0, left: 0, right: 0, zIndex: 100 }}>
           <Header />
         </div>
       )}
-      
-      <div className="flex flex-1 pt-16"> {/* Add padding-top to account for fixed header */}
+
+      <AntLayout style={{ marginTop: showHeader ? 64 : 0 }}>
         {showSidebar && (
-          <Sidebar 
-            isOpen={sidebarOpen} 
-            onToggle={toggleSidebar}
-          />
+          <Sidebar isOpen={sidebarOpen} onToggle={() => setSidebarOpen(!sidebarOpen)} />
         )}
-        
-        <main className={`flex-1 ${showSidebar ? 'lg:ml-64' : ''}`}>
-          {/* Sidebar toggle button for mobile */}
-          {showSidebar && (
-            <div className="lg:hidden p-4">
-              <button
-                onClick={toggleSidebar}
-                className="p-2 rounded-md text-gray-700 hover:bg-gray-100"
-              >
-                <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-                </svg>
-              </button>
+
+        <Content>
+          {showSidebar && !isLg && (
+            <div style={{ padding: '12px 16px' }}>
+              <Button
+                type="text"
+                icon={<MenuOutlined />}
+                onClick={() => setSidebarOpen(!sidebarOpen)}
+                aria-label="Toggle sidebar"
+              />
             </div>
           )}
-          
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <div style={{ maxWidth: 1280, margin: '0 auto', padding: '32px 24px' }}>
             {children}
           </div>
-        </main>
-      </div>
-      
+        </Content>
+      </AntLayout>
+
       {showFooter && <Footer />}
-    </div>
+    </AntLayout>
   );
 };
 

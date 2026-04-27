@@ -1,5 +1,9 @@
 import React, { type JSX } from 'react';
-import { MessageSquare, Video, Phone, Cloud, Lock, Headphones, Check } from 'lucide-react';
+import { Typography, Row, Col, Card, List, Button, Space, Tag } from 'antd';
+import { CheckOutlined } from '@ant-design/icons';
+import { MessageSquare, Video, Phone, Cloud, Lock, Headphones } from 'lucide-react';
+
+const { Title, Paragraph, Text } = Typography;
 
 interface ServiceFeature {
   icon: JSX.Element;
@@ -16,36 +20,12 @@ interface PricingPlan {
 }
 
 const services: ServiceFeature[] = [
-  {
-    icon: <MessageSquare className="h-8 w-8 text-primary-500" />,
-    title: 'Text Messaging',
-    description: 'Send instant messages with emoji support and file sharing capabilities.',
-  },
-  {
-    icon: <Video className="h-8 w-8 text-primary-500" />,
-    title: 'Video Calls',
-    description: 'Crystal clear video calls with up to 8 participants simultaneously.',
-  },
-  {
-    icon: <Phone className="h-8 w-8 text-primary-500" />,
-    title: 'Voice Calls',
-    description: 'High-quality voice calls with noise cancellation technology.',
-  },
-  {
-    icon: <Cloud className="h-8 w-8 text-primary-500" />,
-    title: 'Cloud Storage',
-    description: 'Secure cloud storage for your messages and shared files.',
-  },
-  {
-    icon: <Lock className="h-8 w-8 text-primary-500" />,
-    title: 'Enhanced Security',
-    description: 'End-to-end encryption and two-factor authentication.',
-  },
-  {
-    icon: <Headphones className="h-8 w-8 text-primary-500" />,
-    title: '24/7 Support',
-    description: 'Round-the-clock customer support for all your needs.',
-  },
+  { icon: <MessageSquare size={32} color="#e8385a" />, title: 'Text Messaging',    description: 'Send instant messages with emoji support and file sharing capabilities.' },
+  { icon: <Video         size={32} color="#e8385a" />, title: 'Video Calls',       description: 'Crystal clear video calls with up to 8 participants simultaneously.' },
+  { icon: <Phone         size={32} color="#e8385a" />, title: 'Voice Calls',       description: 'High-quality voice calls with noise cancellation technology.' },
+  { icon: <Cloud         size={32} color="#e8385a" />, title: 'Cloud Storage',     description: 'Secure cloud storage for your messages and shared files.' },
+  { icon: <Lock          size={32} color="#e8385a" />, title: 'Enhanced Security', description: 'End-to-end encryption and two-factor authentication.' },
+  { icon: <Headphones    size={32} color="#e8385a" />, title: '24/7 Support',      description: 'Round-the-clock customer support for all your needs.' },
 ];
 
 const pricingPlans: PricingPlan[] = [
@@ -53,150 +33,120 @@ const pricingPlans: PricingPlan[] = [
     name: 'Basic',
     price: 'Free',
     description: 'Perfect for personal use',
-    features: [
-      'Unlimited text messaging',
-      'Basic file sharing',
-      'Group chats up to 10 people',
-      '1GB cloud storage',
-      'Standard support',
-    ],
+    features: ['Unlimited text messaging', 'Basic file sharing', 'Group chats up to 10 people', '1GB cloud storage', 'Standard support'],
   },
   {
     name: 'Pro',
     price: '$9.99/mo',
     description: 'Great for small teams',
     highlighted: true,
-    features: [
-      'Everything in Basic',
-      'Video calls up to 8 people',
-      'Group chats up to 50 people',
-      '10GB cloud storage',
-      'Priority support',
-      'Custom emojis',
-    ],
+    features: ['Everything in Basic', 'Video calls up to 8 people', 'Group chats up to 50 people', '10GB cloud storage', 'Priority support', 'Custom emojis'],
   },
   {
     name: 'Enterprise',
     price: 'Custom',
     description: 'For large organizations',
-    features: [
-      'Everything in Pro',
-      'Unlimited video calls',
-      'Unlimited group size',
-      'Custom storage options',
-      '24/7 dedicated support',
-      'Admin dashboard',
-      'Custom integration',
-    ],
+    features: ['Everything in Pro', 'Unlimited video calls', 'Unlimited group size', 'Custom storage options', '24/7 dedicated support', 'Admin dashboard', 'Custom integration'],
   },
 ];
 
 const ServicePage: React.FC = () => {
   return (
-    <div className="min-h-screen bg-background dark:bg-gray-900">
-      {/* Hero Section */}
-      <section className="py-20 px-4">
-        <div className="max-w-6xl mx-auto text-center">
-          <h1 className="text-4xl md:text-5xl font-bold text-gray-900 dark:text-white mb-6">
-            Our Services
-          </h1>
-          <p className="text-xl text-gray-600 dark:text-gray-400 max-w-3xl mx-auto">
-            Discover the full range of communication tools and services designed to keep you connected with the world.
-          </p>
-        </div>
+    <div>
+      {/* Hero */}
+      <section style={{ padding: '64px 0 48px', textAlign: 'center' }}>
+        <Title>Our Services</Title>
+        <Paragraph style={{ fontSize: 18, color: '#6b7280', maxWidth: 720, margin: '0 auto' }}>
+          Discover the full range of communication tools and services designed to keep you connected with the world.
+        </Paragraph>
       </section>
 
       {/* Services Grid */}
-      <section className="py-16 px-4">
-        <div className="max-w-6xl mx-auto">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {services.map((service, index) => (
-              <div
-                key={index}
-                className="p-6 bg-surface rounded-lg shadow-sm card-hover transition-shadow"
-              >
-                <div className="mb-4">{service.icon}</div>
-                <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
-                  {service.title}
-                </h3>
-                <p className="text-gray-600 dark:text-gray-400">
-                  {service.description}
-                </p>
-              </div>
-            ))}
-          </div>
-        </div>
+      <section style={{ marginBottom: 64 }}>
+        <Row gutter={[24, 24]}>
+          {services.map((s) => (
+            <Col key={s.title} xs={24} md={12} lg={8}>
+              <Card hoverable style={{ height: '100%' }}>
+                <Space align="start">
+                  <div style={{ marginTop: 4 }}>{s.icon}</div>
+                  <div>
+                    <Title level={5} style={{ marginBottom: 4 }}>{s.title}</Title>
+                    <Paragraph type="secondary" style={{ marginBottom: 0 }}>{s.description}</Paragraph>
+                  </div>
+                </Space>
+              </Card>
+            </Col>
+          ))}
+        </Row>
       </section>
 
-      {/* Pricing Section */}
-      <section className="py-16 px-4 bg-gray-50 dark:bg-gray-800">
-        <div className="max-w-6xl mx-auto">
-          <h2 className="text-3xl font-bold text-center text-gray-900 dark:text-white mb-12">
-            Choose Your Plan
-          </h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {pricingPlans.map((plan, index) => (
-              <div
-                key={index}
-                className={`p-6 rounded-lg ${
-                  plan.highlighted
-                    ? 'bg-primary-500 text-white transform scale-105'
-                    : 'bg-white dark:bg-gray-700'
-                }`}
+      {/* Pricing */}
+      <section style={{ padding: '48px 32px', background: 'rgba(0,0,0,0.02)', borderRadius: 16, marginBottom: 64 }}>
+        <Title level={2} style={{ textAlign: 'center', marginBottom: 40 }}>Choose Your Plan</Title>
+        <Row gutter={[24, 24]} align="middle">
+          {pricingPlans.map((plan) => (
+            <Col key={plan.name} xs={24} md={8}>
+              <Card
+                style={{
+                  textAlign: 'center',
+                  background: plan.highlighted ? '#e8385a' : undefined,
+                  transform: plan.highlighted ? 'scale(1.04)' : undefined,
+                  boxShadow: plan.highlighted ? '0 8px 32px rgba(232,56,90,0.3)' : undefined,
+                  height: '100%',
+                }}
+                styles={{ body: { padding: 32 } }}
               >
-                <div className="text-center">
-                  <h3 className={`text-2xl font-bold mb-2 ${
-                    plan.highlighted ? 'text-white' : 'text-gray-900 dark:text-white'
-                  }`}>
-                    {plan.name}
-                  </h3>
-                  <div className="text-3xl font-bold mb-2">{plan.price}</div>
-                  <p className={`mb-6 ${
-                    plan.highlighted ? 'text-white/90' : 'text-gray-600 dark:text-gray-400'
-                  }`}>
-                    {plan.description}
-                  </p>
-                </div>
-                <ul className="space-y-3">
-                  {plan.features.map((feature, featureIndex) => (
-                    <li key={featureIndex} className="flex items-center">
-                      <Check className={`h-5 w-5 mr-2 ${
-                        plan.highlighted ? 'text-white' : 'text-primary-500'
-                      }`} />
-                      <span className={plan.highlighted ? 'text-white' : 'dark:text-gray-300'}>
-                        {feature}
-                      </span>
-                    </li>
-                  ))}
-                </ul>
-                <button
-                  className={`w-full mt-8 py-3 px-6 rounded-full font-semibold ${
-                    plan.highlighted
-                      ? 'bg-white text-primary-500 hover:bg-gray-100'
-                      : 'bg-primary-500 text-white hover:bg-primary-600'
-                  } transition-colors`}
+                {plan.highlighted && <Tag color="gold" style={{ marginBottom: 12 }}>Most Popular</Tag>}
+                <Title level={3} style={{ color: plan.highlighted ? '#fff' : undefined, marginBottom: 4 }}>
+                  {plan.name}
+                </Title>
+                <Title level={2} style={{ color: plan.highlighted ? '#fff' : '#e8385a', margin: '8px 0' }}>
+                  {plan.price}
+                </Title>
+                <Text style={{ color: plan.highlighted ? 'rgba(255,255,255,0.85)' : '#6b7280' }}>
+                  {plan.description}
+                </Text>
+                <List
+                  style={{ marginTop: 24, textAlign: 'left' }}
+                  dataSource={plan.features}
+                  renderItem={(f) => (
+                    <List.Item style={{ padding: '6px 0', border: 'none' }}>
+                      <Space>
+                        <CheckOutlined style={{ color: plan.highlighted ? '#fff' : '#e8385a' }} />
+                        <Text style={{ color: plan.highlighted ? '#fff' : undefined }}>{f}</Text>
+                      </Space>
+                    </List.Item>
+                  )}
+                />
+                <Button
+                  size="large"
+                  shape="round"
+                  block
+                  style={{
+                    marginTop: 24,
+                    ...(plan.highlighted
+                      ? { background: '#fff', color: '#e8385a', borderColor: '#fff' }
+                      : {}),
+                  }}
+                  type={plan.highlighted ? 'default' : 'primary'}
                 >
                   Get Started
-                </button>
-              </div>
-            ))}
-          </div>
-        </div>
+                </Button>
+              </Card>
+            </Col>
+          ))}
+        </Row>
       </section>
 
-      {/* CTA Section */}
-      <section className="py-16 px-4">
-        <div className="max-w-4xl mx-auto text-center">
-          <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-6">
-            Need Custom Solutions?
-          </h2>
-          <p className="text-lg text-gray-600 dark:text-gray-400 mb-8">
-            Contact our sales team to discuss custom enterprise solutions tailored to your organization's needs.
-          </p>
-          <button className="bg-primary-500 text-white px-8 py-3 rounded-full font-semibold hover:bg-primary-600 transition-colors">
-            Contact Sales
-          </button>
-        </div>
+      {/* CTA */}
+      <section style={{ textAlign: 'center', padding: '48px 0 32px' }}>
+        <Title level={2}>Need Custom Solutions?</Title>
+        <Paragraph style={{ fontSize: 16, color: '#6b7280', maxWidth: 560, margin: '12px auto 32px' }}>
+          Contact our sales team to discuss custom enterprise solutions tailored to your organization's needs.
+        </Paragraph>
+        <Button type="primary" size="large" shape="round" style={{ minWidth: 160 }}>
+          Contact Sales
+        </Button>
       </section>
     </div>
   );
