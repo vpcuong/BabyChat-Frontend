@@ -2,7 +2,8 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Form, Input, Button, Checkbox, Divider, Alert, Typography, Card, Space, Row, Col } from 'antd';
 import { MailOutlined, LockOutlined, GoogleOutlined, FacebookOutlined } from '@ant-design/icons';
-import apiClient from '../src/api/apiClient';
+import { useThemeToken } from '../hooks/useThemeToken';
+import apiClient from '../api/apiClient';
 
 const { Title, Text } = Typography;
 
@@ -14,6 +15,7 @@ interface LoginFormData {
 
 const LoginPage: React.FC = () => {
   const navigate = useNavigate();
+  const token = useThemeToken();
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [form] = Form.useForm<LoginFormData>();
@@ -62,11 +64,10 @@ const LoginPage: React.FC = () => {
         {error && (
           <Alert
             type="error"
-            message={error}
+            description={error}
             showIcon
             style={{ marginBottom: 20, whiteSpace: 'pre-line' }}
-            closable
-            onClose={() => setError(null)}
+            closable={{ afterClose: () => setError(null) }}
           />
         )}
 
@@ -79,7 +80,7 @@ const LoginPage: React.FC = () => {
             ]}
           >
             <Input
-              prefix={<MailOutlined style={{ color: '#9ca3af' }} />}
+              prefix={<MailOutlined style={{ color: token.colorTextPlaceholder }} />}
               placeholder="Email address"
               size="large"
               autoComplete="off"
@@ -91,7 +92,7 @@ const LoginPage: React.FC = () => {
             rules={[{ required: true, message: 'Password is required' }]}
           >
             <Input.Password
-              prefix={<LockOutlined style={{ color: '#9ca3af' }} />}
+              prefix={<LockOutlined style={{ color: token.colorTextPlaceholder }} />}
               placeholder="Password"
               size="large"
               autoComplete="current-password"
@@ -120,7 +121,7 @@ const LoginPage: React.FC = () => {
 
         <Divider plain>Or continue with</Divider>
 
-        <Space style={{ width: '100%' }} direction="vertical" size={12}>
+        <Space style={{ width: '100%', flexDirection: 'column' }} size={12}>
           <Button
             icon={<GoogleOutlined style={{ color: '#ea4335' }} />}
             size="large"

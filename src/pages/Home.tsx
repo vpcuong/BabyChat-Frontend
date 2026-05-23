@@ -2,42 +2,34 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { Typography, Button, Row, Col, Card, Space } from 'antd';
 import { MessageSquareText, Users, ShieldCheck, Zap } from 'lucide-react';
+import { useThemeToken } from '../hooks/useThemeToken';
 
 const { Title, Paragraph, Text } = Typography;
 
-const features = [
-  {
-    icon: <Zap size={32} color="#e8385a" />,
-    title: 'Instant Messaging',
-    description: 'Connect in real-time with our blazing-fast messaging infrastructure. No delays, just conversation.',
-  },
-  {
-    icon: <Users size={32} color="#e8385a" />,
-    title: 'Group Chats',
-    description: 'Create groups for your friends, family, or team. Stay connected with everyone in one place.',
-  },
-  {
-    icon: <ShieldCheck size={32} color="#e8385a" />,
-    title: 'Secure & Private',
-    description: 'Your conversations are yours. With end-to-end encryption, your privacy is our top priority.',
-  },
-  {
-    icon: <MessageSquareText size={32} color="#e8385a" />,
-    title: 'Rich Communication',
-    description: 'Express yourself fully with support for emojis, GIFs, and file sharing. Make every chat lively.',
-  },
+const featureIcons = [Zap, Users, ShieldCheck, MessageSquareText];
+const featureDefs = [
+  { title: 'Instant Messaging',  description: 'Connect in real-time with our blazing-fast messaging infrastructure. No delays, just conversation.' },
+  { title: 'Group Chats',        description: 'Create groups for your friends, family, or team. Stay connected with everyone in one place.' },
+  { title: 'Secure & Private',   description: 'Your conversations are yours. With end-to-end encryption, your privacy is our top priority.' },
+  { title: 'Rich Communication', description: 'Express yourself fully with support for emojis, GIFs, and file sharing. Make every chat lively.' },
 ];
 
 const HomePage: React.FC = () => {
+  const token = useThemeToken();
+  const features = featureDefs.map((f, i) => ({
+    ...f,
+    icon: React.createElement(featureIcons[i], { size: 32, color: token.colorPrimary }),
+  }));
+
   return (
     <div>
       {/* Hero Section */}
       <section style={{ padding: '80px 0 60px', textAlign: 'center' }}>
         <Title style={{ fontSize: 52, lineHeight: 1.15 }}>
           Connect Instantly,{' '}
-          <Text style={{ color: '#e8385a', fontSize: 'inherit' }}>Chat Seamlessly.</Text>
+          <Text style={{ color: token.colorPrimary, fontSize: 'inherit' }}>Chat Seamlessly.</Text>
         </Title>
-        <Paragraph style={{ fontSize: 18, maxWidth: 600, margin: '16px auto 32px', color: '#6b7280' }}>
+        <Paragraph style={{ fontSize: 18, maxWidth: 600, margin: '16px auto 32px', color: token.colorTextSecondary }}>
           Welcome to Baby Chat, the simple, fast, and secure way to stay in touch with the people who matter most.
         </Paragraph>
         <Space size={16} wrap>
@@ -58,7 +50,7 @@ const HomePage: React.FC = () => {
       <section style={{ padding: '60px 0', background: 'rgba(0,0,0,0.02)', borderRadius: 16 }}>
         <div style={{ textAlign: 'center', marginBottom: 40 }}>
           <Title level={2}>Everything You Need to Connect</Title>
-          <Paragraph style={{ color: '#6b7280' }}>
+          <Paragraph style={{ color: token.colorTextSecondary }}>
             A feature-rich experience designed for modern communication.
           </Paragraph>
         </div>
@@ -80,7 +72,7 @@ const HomePage: React.FC = () => {
       {/* CTA Section */}
       <section style={{ padding: '80px 0', textAlign: 'center' }}>
         <Title level={2}>Ready to Join the Conversation?</Title>
-        <Paragraph style={{ fontSize: 16, color: '#6b7280', maxWidth: 480, margin: '12px auto 32px' }}>
+        <Paragraph style={{ fontSize: 16, color: token.colorTextSecondary, maxWidth: 480, margin: '12px auto 32px' }}>
           Create an account in seconds and start connecting with your world today. It's free!
         </Paragraph>
         <Link to="/signup">

@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Form, Input, Button, Typography, Card, Space, List } from 'antd';
 import { UserOutlined, MailOutlined, LockOutlined, CheckCircleFilled, CloseCircleFilled } from '@ant-design/icons';
-import apiClient from '../src/api/apiClient';
+import apiClient from '../api/apiClient';
 import { useToast } from '../hooks/useToast';
 
 const { Title, Text } = Typography;

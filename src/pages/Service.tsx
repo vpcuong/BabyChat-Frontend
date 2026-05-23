@@ -2,6 +2,7 @@ import React, { type JSX } from 'react';
 import { Typography, Row, Col, Card, List, Button, Space, Tag } from 'antd';
 import { CheckOutlined } from '@ant-design/icons';
 import { MessageSquare, Video, Phone, Cloud, Lock, Headphones } from 'lucide-react';
+import { useThemeToken } from '../hooks/useThemeToken';
 
 const { Title, Paragraph, Text } = Typography;
 
@@ -19,13 +20,13 @@ interface PricingPlan {
   highlighted?: boolean;
 }
 
-const services: ServiceFeature[] = [
-  { icon: <MessageSquare size={32} color="#e8385a" />, title: 'Text Messaging',    description: 'Send instant messages with emoji support and file sharing capabilities.' },
-  { icon: <Video         size={32} color="#e8385a" />, title: 'Video Calls',       description: 'Crystal clear video calls with up to 8 participants simultaneously.' },
-  { icon: <Phone         size={32} color="#e8385a" />, title: 'Voice Calls',       description: 'High-quality voice calls with noise cancellation technology.' },
-  { icon: <Cloud         size={32} color="#e8385a" />, title: 'Cloud Storage',     description: 'Secure cloud storage for your messages and shared files.' },
-  { icon: <Lock          size={32} color="#e8385a" />, title: 'Enhanced Security', description: 'End-to-end encryption and two-factor authentication.' },
-  { icon: <Headphones    size={32} color="#e8385a" />, title: '24/7 Support',      description: 'Round-the-clock customer support for all your needs.' },
+const serviceDefs: Array<{ Icon: React.FC<{ size: number; color: string }>; title: string; description: string }> = [
+  { Icon: MessageSquare, title: 'Text Messaging',    description: 'Send instant messages with emoji support and file sharing capabilities.' },
+  { Icon: Video,         title: 'Video Calls',       description: 'Crystal clear video calls with up to 8 participants simultaneously.' },
+  { Icon: Phone,         title: 'Voice Calls',       description: 'High-quality voice calls with noise cancellation technology.' },
+  { Icon: Cloud,         title: 'Cloud Storage',     description: 'Secure cloud storage for your messages and shared files.' },
+  { Icon: Lock,          title: 'Enhanced Security', description: 'End-to-end encryption and two-factor authentication.' },
+  { Icon: Headphones,    title: '24/7 Support',      description: 'Round-the-clock customer support for all your needs.' },
 ];
 
 const pricingPlans: PricingPlan[] = [
@@ -51,12 +52,19 @@ const pricingPlans: PricingPlan[] = [
 ];
 
 const ServicePage: React.FC = () => {
+  const token = useThemeToken();
+  const services: ServiceFeature[] = serviceDefs.map(({ Icon, title, description }) => ({
+    icon: <Icon size={32} color={token.colorPrimary} />,
+    title,
+    description,
+  }));
+
   return (
     <div>
       {/* Hero */}
       <section style={{ padding: '64px 0 48px', textAlign: 'center' }}>
         <Title>Our Services</Title>
-        <Paragraph style={{ fontSize: 18, color: '#6b7280', maxWidth: 720, margin: '0 auto' }}>
+        <Paragraph style={{ fontSize: 18, color: token.colorTextSecondary, maxWidth: 720, margin: '0 auto' }}>
           Discover the full range of communication tools and services designed to keep you connected with the world.
         </Paragraph>
       </section>
@@ -89,9 +97,9 @@ const ServicePage: React.FC = () => {
               <Card
                 style={{
                   textAlign: 'center',
-                  background: plan.highlighted ? '#e8385a' : undefined,
+                  background: plan.highlighted ? token.colorPrimary : undefined,
                   transform: plan.highlighted ? 'scale(1.04)' : undefined,
-                  boxShadow: plan.highlighted ? '0 8px 32px rgba(232,56,90,0.3)' : undefined,
+                  boxShadow: plan.highlighted ? `0 8px 32px ${token.colorPrimaryBorder}` : undefined,
                   height: '100%',
                 }}
                 styles={{ body: { padding: 32 } }}
@@ -100,10 +108,10 @@ const ServicePage: React.FC = () => {
                 <Title level={3} style={{ color: plan.highlighted ? '#fff' : undefined, marginBottom: 4 }}>
                   {plan.name}
                 </Title>
-                <Title level={2} style={{ color: plan.highlighted ? '#fff' : '#e8385a', margin: '8px 0' }}>
+                <Title level={2} style={{ color: plan.highlighted ? '#fff' : token.colorPrimary, margin: '8px 0' }}>
                   {plan.price}
                 </Title>
-                <Text style={{ color: plan.highlighted ? 'rgba(255,255,255,0.85)' : '#6b7280' }}>
+                <Text style={{ color: plan.highlighted ? 'rgba(255,255,255,0.85)' : token.colorTextSecondary }}>
                   {plan.description}
                 </Text>
                 <List
@@ -112,7 +120,7 @@ const ServicePage: React.FC = () => {
                   renderItem={(f) => (
                     <List.Item style={{ padding: '6px 0', border: 'none' }}>
                       <Space>
-                        <CheckOutlined style={{ color: plan.highlighted ? '#fff' : '#e8385a' }} />
+                        <CheckOutlined style={{ color: plan.highlighted ? '#fff' : token.colorPrimary }} />
                         <Text style={{ color: plan.highlighted ? '#fff' : undefined }}>{f}</Text>
                       </Space>
                     </List.Item>
@@ -125,7 +133,7 @@ const ServicePage: React.FC = () => {
                   style={{
                     marginTop: 24,
                     ...(plan.highlighted
-                      ? { background: '#fff', color: '#e8385a', borderColor: '#fff' }
+                      ? { background: '#fff', color: token.colorPrimary, borderColor: '#fff' }
                       : {}),
                   }}
                   type={plan.highlighted ? 'default' : 'primary'}
@@ -141,7 +149,7 @@ const ServicePage: React.FC = () => {
       {/* CTA */}
       <section style={{ textAlign: 'center', padding: '48px 0 32px' }}>
         <Title level={2}>Need Custom Solutions?</Title>
-        <Paragraph style={{ fontSize: 16, color: '#6b7280', maxWidth: 560, margin: '12px auto 32px' }}>
+        <Paragraph style={{ fontSize: 16, color: token.colorTextSecondary, maxWidth: 560, margin: '12px auto 32px' }}>
           Contact our sales team to discuss custom enterprise solutions tailored to your organization's needs.
         </Paragraph>
         <Button type="primary" size="large" shape="round" style={{ minWidth: 160 }}>

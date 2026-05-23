@@ -2,13 +2,13 @@
 import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { ConfigProvider, theme as antdTheme, Typography } from 'antd';
-import { Layout } from '../components/Layout';
-import MessagesPage from '../pages/Messages';
-import HomePage from '../pages/Home';
-import Login from '../pages/Login';
-import SignUp from '../pages/SignUp';
-import About from '../pages/About';
-import Service from '../pages/Service';
+import { Layout } from './components/Layout';
+import MessagesPage from './pages/Messages';
+import HomePage from './pages/Home';
+import Login from './pages/Login';
+import SignUp from './pages/SignUp';
+import About from './pages/About';
+import Service from './pages/Service';
 import { Toaster } from 'react-hot-toast';
 
 // Example page components
@@ -40,13 +40,22 @@ const App: React.FC = () => {
         algorithm: isDark ? antdTheme.darkAlgorithm : antdTheme.defaultAlgorithm,
         token: {
           colorPrimary: '#e8385a',
+          colorSuccess: '#52c41a',
+          colorWarning: '#f59e0b',
+          colorError: '#ef4444',
+          colorInfo: '#3b82f6',
+          colorTextSecondary: '#6b7280',
+          colorTextPlaceholder: '#9ca3af',
           borderRadius: 8,
           fontFamily: 'inherit',
+        },
+        components: {
+          Badge: { colorPrimary: '#e8385a' },
         },
       }}
     >
     <div className="App">
-      <Router>
+      <Router future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
         <Routes>
           {/* Routes with standard layout */}
           <Route

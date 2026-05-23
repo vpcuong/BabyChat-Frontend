@@ -2,7 +2,8 @@ import React, { useState, useRef, useEffect } from 'react';
 import { Phone, Video, MoreVertical, Smile, Paperclip } from 'lucide-react';
 import { Input, Button, Badge, Avatar, Tooltip, Typography, Space } from 'antd';
 import { SearchOutlined, SendOutlined } from '@ant-design/icons';
-import apiClient from '../src/api/apiClient';
+import apiClient from '../api/apiClient';
+import { useThemeToken } from '../hooks/useThemeToken';
 
 const { Text, Title } = Typography;
 
@@ -22,9 +23,8 @@ interface IMessage {
   timestamp: string;
 }
 
-const TOKEN = '#e8385a';
-
 const MessagesPage: React.FC = () => {
+  const token = useThemeToken();
   const [conversations, setConversations] = useState<IConversation[]>([]);
   const [selectedConversation, setSelectedConversation] = useState<IConversation | null>(null);
   const [messages, setMessages] = useState<IMessage[]>([]);
@@ -101,12 +101,12 @@ const MessagesPage: React.FC = () => {
   return (
     <div style={{ display: 'flex', height: 'calc(100vh - 8rem)', overflow: 'hidden' }}>
       {/* Conversation List */}
-      <div style={{ width: '25%', borderRight: '1px solid #f0f0f0', display: 'flex', flexDirection: 'column' }}>
-        <div style={{ padding: 16, borderBottom: '1px solid #f0f0f0' }}>
+      <div style={{ width: '25%', borderRight: `1px solid ${token.colorBorderSecondary}`, display: 'flex', flexDirection: 'column' }}>
+        <div style={{ padding: 16, borderBottom: `1px solid ${token.colorBorderSecondary}` }}>
           <Title level={4} style={{ margin: '0 0 12px' }}>Chats</Title>
           <Input
             placeholder="Search messages"
-            prefix={<SearchOutlined style={{ color: '#9ca3af' }} />}
+            prefix={<SearchOutlined style={{ color: token.colorTextPlaceholder }} />}
             style={{ borderRadius: 999 }}
             aria-label="Search messages"
           />
@@ -124,11 +124,11 @@ const MessagesPage: React.FC = () => {
                   alignItems: 'center',
                   padding: '12px 16px',
                   cursor: 'pointer',
-                  background: isSelected ? '#fff0f3' : undefined,
-                  borderLeft: isSelected ? `3px solid ${TOKEN}` : '3px solid transparent',
+                  background: isSelected ? token.colorPrimaryBg : undefined,
+                  borderLeft: isSelected ? `3px solid ${token.colorPrimary}` : '3px solid transparent',
                   transition: 'background 0.15s',
                 }}
-                onMouseEnter={(e) => { if (!isSelected) e.currentTarget.style.background = '#fafafa'; }}
+                onMouseEnter={(e) => { if (!isSelected) e.currentTarget.style.background = token.colorBgTextHover; }}
                 onMouseLeave={(e) => { if (!isSelected) e.currentTarget.style.background = ''; }}
               >
                 <Avatar src={convo.avatar} alt={convo.name} size={48} style={{ flexShrink: 0, marginRight: 12 }} />
@@ -157,7 +157,7 @@ const MessagesPage: React.FC = () => {
       {/* Chat Window */}
       <div style={{ flex: 1, display: 'flex', flexDirection: 'column', minWidth: 0 }}>
         {/* Chat Header */}
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '8px 16px', borderBottom: '1px solid #f0f0f0' }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '8px 16px', borderBottom: `1px solid ${token.colorBorderSecondary}` }}>
           <Space>
             <Avatar src={selectedConversation?.avatar} size={40} />
             <div>
@@ -179,7 +179,7 @@ const MessagesPage: React.FC = () => {
         </div>
 
         {/* Messages Area */}
-        <div style={{ flex: 1, padding: 24, overflowY: 'auto', background: '#fafafa' }}>
+        <div style={{ flex: 1, padding: 24, overflowY: 'auto', background: token.colorBgLayout }}>
           {messages.map((msg) => {
             const isMe = msg.sender === 'me';
             return (
@@ -188,12 +188,12 @@ const MessagesPage: React.FC = () => {
                   maxWidth: 420,
                   padding: '10px 14px',
                   borderRadius: 16,
-                  background: isMe ? TOKEN : '#fff',
-                  border: isMe ? 'none' : '1px solid #f0f0f0',
+                  background: isMe ? token.colorPrimary : token.colorBgContainer,
+                  border: isMe ? 'none' : `1px solid ${token.colorBorderSecondary}`,
                   boxShadow: '0 1px 2px rgba(0,0,0,0.06)',
                 }}>
                   <Text style={{ display: 'block', color: isMe ? '#fff' : undefined }}>{msg.text}</Text>
-                  <Text style={{ display: 'block', fontSize: 11, marginTop: 4, textAlign: 'right', color: isMe ? 'rgba(255,255,255,0.7)' : '#9ca3af' }}>
+                  <Text style={{ display: 'block', fontSize: 11, marginTop: 4, textAlign: 'right', color: isMe ? 'rgba(255,255,255,0.7)' : token.colorTextPlaceholder }}>
                     {msg.timestamp}
                   </Text>
                 </div>
@@ -204,7 +204,7 @@ const MessagesPage: React.FC = () => {
         </div>
 
         {/* Message Input */}
-        <div style={{ padding: '12px 16px', background: '#fff', borderTop: '1px solid #f0f0f0' }}>
+        <div style={{ padding: '12px 16px', background: token.colorBgContainer, borderTop: `1px solid ${token.colorBorderSecondary}` }}>
           <form onSubmit={handleSendMessage}>
             <Space.Compact style={{ width: '100%', display: 'flex', alignItems: 'center', gap: 8 }}>
               <Tooltip title="Attach file">
