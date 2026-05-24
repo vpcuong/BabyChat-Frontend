@@ -3,7 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { Form, Input, Button, Checkbox, Divider, Alert, Typography, Card, Space, Row, Col } from 'antd';
 import { MailOutlined, LockOutlined, GoogleOutlined, FacebookOutlined } from '@ant-design/icons';
 import { useThemeToken } from '../hooks/useThemeToken';
-import apiClient from '../api/apiClient';
+import { authService } from '../services/authService';
 
 const { Title, Text } = Typography;
 
@@ -24,14 +24,7 @@ const LoginPage: React.FC = () => {
     setIsLoading(true);
     setError(null);
     try {
-      const { data } = await apiClient.post('/auth/login', {
-        email: values.email,
-        password: values.password,
-      });
-      localStorage.setItem('username',      data.user.username);
-      localStorage.setItem('email',         data.user.email);
-      localStorage.setItem('access_token',  data.access_token);
-      localStorage.setItem('refresh_token', data.refresh_token);
+      await authService.login({ email: values.email, password: values.password });
       navigate('/');
     } catch (err: unknown) {
       const msg = (err as any)?.response?.data?.message;

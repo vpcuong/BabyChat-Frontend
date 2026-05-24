@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Form, Input, Button, Typography, Card, Space, List } from 'antd';
 import { UserOutlined, MailOutlined, LockOutlined, CheckCircleFilled, CloseCircleFilled } from '@ant-design/icons';
-import apiClient from '../api/apiClient';
+import { authService } from '../services/authService';
 import { useToast } from '../hooks/useToast';
 
 const { Title, Text } = Typography;
@@ -37,12 +37,8 @@ const SignUpPage: React.FC = () => {
   const handleSubmit = async (values: SignUpFormData) => {
     setIsLoading(true);
     try {
-      const { data } = await apiClient.post('/auth/register', values);
+      const data = await authService.register(values);
       toast.success(`Sign up successful!\nWelcome ${data.user.username}`);
-      localStorage.setItem('username',      data.user.username);
-      localStorage.setItem('email',         data.user.email);
-      localStorage.setItem('access_token',  data.access_token);
-      localStorage.setItem('refresh_token', data.refresh_token);
       navigate('/');
     } catch (error: unknown) {
       const msg = (error as any)?.response?.data?.message;

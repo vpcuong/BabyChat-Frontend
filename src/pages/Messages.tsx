@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { Phone, Video, MoreVertical, Smile, Paperclip } from 'lucide-react';
 import { Input, Button, Badge, Avatar, Tooltip, Typography, Space } from 'antd';
 import { SearchOutlined, SendOutlined } from '@ant-design/icons';
-import apiClient from '../api/apiClient';
+import { conversationService } from '../services/conversationService';
 import { useThemeToken } from '../hooks/useThemeToken';
 
 const { Text, Title } = Typography;
@@ -17,7 +17,7 @@ interface IConversation {
 }
 
 interface IMessage {
-  id: number;
+  id: string;
   sender: string;
   text: string;
   timestamp: string;
@@ -34,15 +34,17 @@ const MessagesPage: React.FC = () => {
 
   useEffect(() => {
     const fetchData = async () => {
-      const response = await apiClient.get('/conversations');
-      const convData: IConversation[] = response.data.map((conv: any) => ({
-        id: conv._id,
-        ...conv,
-        avatar: conv.avatar || `https://i.pravatar.cc/150?u=${conv._id}`,
-        lastMessage: conv.lastMessage || 'No messages yet',
-        timestamp: conv.timestamp || new Date().toLocaleTimeString(),
-        unread: conv.unread || 0,
-      }));
+      const dtos = await conversationService.getConversations();
+      const convData: IConversation[] = dtos
+        .filter((conv) => conv._id)
+        .map((conv) => ({
+          id: conv._id,
+          name: conv.name,
+          avatar: conv.avatar || `https://i.pravatar.cc/150?u=${conv._id}`,
+          lastMessage: conv.lastMessage || 'No messages yet',
+          timestamp: conv.timestamp || new Date().toLocaleTimeString(),
+          unread: conv.unread || 0,
+        }));
       setConversations(convData);
       if (convData.length > 0) setSelectedConversation(convData[0]);
     };
@@ -55,16 +57,13 @@ const MessagesPage: React.FC = () => {
 
   useEffect(() => {
     const fetchMessages = async () => {
-      if (!selectedConversation) return;
-      const response = await apiClient.get(`/conversations/${selectedConversation.id}/pages`);
-      const pages = response.data.pages.list;
-      if (pages.length === 0) { setMessages([]); return; }
-      const lastPage = pages[pages.length - 1];
-      const messagesData: IMessage[] = lastPage.messages.map((message: any) => ({
-        id: message._id,
-        sender: message.sender,
-        text: message.content,
-        timestamp: message.timestamp || new Date().toLocaleTimeString(),
+      if (!selectedConversation?.id) return;
+      const dtos = await conversationService.getMessages(selectedConversation.id);
+      const messagesData: IMessage[] = dtos.map((msg) => ({
+        id: msg._id,
+        sender: msg.sender,
+        text: msg.content,
+        timestamp: msg.timestamp || new Date().toLocaleTimeString(),
       }));
       setMessages(messagesData);
     };
@@ -73,10 +72,10 @@ const MessagesPage: React.FC = () => {
 
   const handleSendMessage = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (!newMessage.trim() || isSending) return;
+    if (!newMessage.trim() || isSending || !selectedConversation) return;
 
     const optimisticMsg: IMessage = {
-      id: Date.now(),
+      id: `optimistic-${Date.now()}`,
       sender: 'me',
       text: newMessage,
       timestamp: new Date().toLocaleTimeString(),
@@ -86,8 +85,8 @@ const MessagesPage: React.FC = () => {
     setIsSending(true);
 
     try {
-      await apiClient.post('/conversations/messages', {
-        conversationId: selectedConversation?.id,
+      await conversationService.sendMessage({
+        conversationId: selectedConversation.id,
         content: optimisticMsg.text,
       });
     } catch {
@@ -206,7 +205,7 @@ const MessagesPage: React.FC = () => {
         {/* Message Input */}
         <div style={{ padding: '12px 16px', background: token.colorBgContainer, borderTop: `1px solid ${token.colorBorderSecondary}` }}>
           <form onSubmit={handleSendMessage}>
-            <Space.Compact style={{ width: '100%', display: 'flex', alignItems: 'center', gap: 8 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
               <Tooltip title="Attach file">
                 <Button type="text" icon={<Paperclip size={20} />} aria-label="Attach file" />
               </Tooltip>
@@ -229,7 +228,7 @@ const MessagesPage: React.FC = () => {
                 disabled={!newMessage.trim()}
                 aria-label="Send message"
               />
-            </Space.Compact>
+            </div>
           </form>
         </div>
       </div>

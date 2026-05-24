@@ -1,45 +1,40 @@
-class EnvironmentLoader {
-  private static loadedConfig: any = null;
+interface AppConfig {
+  apiUrl: string;
+  features: {
+    debugPanel: boolean;
+    mockData: boolean;
+    hotReload: boolean;
+  };
+}
 
-  static loadConfig() {
+class EnvironmentLoader {
+  private static loadedConfig: AppConfig | null = null;
+
+  static loadConfig(): AppConfig {
     if (this.loadedConfig) {
       return this.loadedConfig;
     }
 
-    const env = import.meta.env.VITE_NODE_ENV;
-    
-    // Different configs for different environments
-    const configs = {
+    // import.meta.env.MODE is set by Vite: 'development' | 'production' | custom
+    const mode = import.meta.env.MODE;
+
+    const configs: Record<string, AppConfig> = {
       development: {
-        apiUrl: import.meta.env.VITE_DEV_API_URL,
-        features: {
-          debugPanel: true,
-          mockData: true,
-          hotReload: true,
-        }
+        apiUrl: import.meta.env.VITE_DEV_API_URL ?? '',
+        features: { debugPanel: true,  mockData: true,  hotReload: true  },
       },
       staging: {
-        apiUrl: import.meta.env.VITE_STAGING_API_URL,
-        features: {
-          debugPanel: true,
-          mockData: false,
-          hotReload: false,
-        }
+        apiUrl: import.meta.env.VITE_STAGING_API_URL ?? '',
+        features: { debugPanel: true,  mockData: false, hotReload: false },
       },
       production: {
-        apiUrl: import.meta.env.VITE_PROD_API_URL,
-        features: {
-          debugPanel: false,
-          mockData: false,
-          hotReload: false,
-        }
-      }
+        apiUrl: import.meta.env.VITE_PROD_API_URL ?? '',
+        features: { debugPanel: false, mockData: false, hotReload: false },
+      },
     };
 
-    const config = configs[env as keyof typeof configs] || configs.development;
-    this.loadedConfig = config;
-    
-    return config;
+    this.loadedConfig = configs[mode] ?? configs['development'];
+    return this.loadedConfig;
   }
 }
 
